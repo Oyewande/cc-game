@@ -52,14 +52,14 @@ export default function StartGame() {
               <button
                 type="button"
                 onClick={() => setOnline(true)}
-                className={`px-3 py-1 rounded ${online ? "bg-indigo-600 text-white" : "bg-gray-100 dark:bg-gray-700"}`}
+                className={`px-3 py-1 rounded ${online ? "bg-green-600 text-white" : "bg-gray-100 dark:bg-gray-700"}`}
               >
                 Online (API)
               </button>
               <button
                 type="button"
                 onClick={() => setOnline(false)}
-                className={`px-3 py-1 rounded ${!online ? "bg-indigo-600 text-white" : "bg-gray-100 dark:bg-gray-700"}`}
+                className={`px-3 py-1 rounded ${!online ? "bg-green-600 text-white" : "bg-gray-100 dark:bg-gray-700"}`}
               >
                 Offline (Local)
               </button>

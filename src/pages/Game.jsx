@@ -92,7 +92,7 @@ export default function Game(){
             <h2 className="text-2xl font-bold mb-2">Game Over</h2>
             <p className="mb-4">{players[0].name}: {players[0].score} — {players[1].name}: {players[1].score}</p>
             <div className="flex gap-3 justify-center">
-              <button onClick={endAndSave} className="px-6 py-2 bg-indigo-600 text-white rounded">Save & Results</button>
+              <button onClick={endAndSave} className="px-6 py-2 bg-green-800 text-white rounded">Save & Results</button>
               <button onClick={()=>window.location.reload()} className="px-4 py-2 border rounded">Restart</button>
             </div>
           </div>

@@ -10,9 +10,9 @@ function Home(){
         <p className="mb-6 text-center text-gray-600 dark:text-gray-300 max-w-xl">Choose single or two-player mode and whether to play online (live API) or offline (local bundle).</p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link to="/start?mode=single" className="px-8 py-3 bg-indigo-600 text-white rounded shadow">▶ Single Player</Link>
-          <Link to="/start?mode=dual" className="px-8 py-3 bg-purple-600 text-white rounded shadow">👥 Two Players</Link>
+          <Link to="/start?mode=dual" className="px-8 py-3 bg-blue-500 text-white rounded shadow">👥 Two Players</Link>
         </div>
-        <Link to="/results" className="mt-6 text-sm text-indigo-600 underline">View Leaderboard / Results</Link>
+        <Link to="/results" className="mt-6 text-sm text-green-700 underline">View Leaderboard / Results</Link>
       </div>
     </>
   );
