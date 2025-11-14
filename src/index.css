@@ -1,6 +1,30 @@
 @import "tailwindcss";
 
-body { 
-  -webkit-font-smoothing:antialiased; 
-  -moz-osx-font-smoothing:grayscale;
+@variant dark (.dark &);
+
+@theme {
+  --color-primary: #1f2937;
+  --color-secondary: #111827;
+  --color-accent: #96A4C5;
+  --color-accent2: #455373;
+  --color-light: #f9fafb;
+  --color-border: #e5e7eb;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    fill 0.3s ease;
 }

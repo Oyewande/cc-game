@@ -30,69 +30,118 @@ export default function StartGame() {
   };
 
   return (
-    <>
+    <div className="h-screen overflow-hidden flex flex-col relative
+                    bg-[#e0e4f1] dark:bg-[#1f2a44] transition-colors duration-300">
       <Navbar />
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-6">
-        <div className="w-full max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-bold mb-4">Start Game</h2>
+      <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto">
+        <div className="w-full max-w-md bg-white dark:bg-[#33405D] p-6 md:p-8 rounded-xl shadow-lg
+                        transition-colors duration-300">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center
+                         text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+            Start Game
+          </h2>
 
-          <div className="mb-4">
-            <label className="block mb-1 font-medium">Mode</label>
+          <div className="mb-6">
+            <label className="block mb-2 font-medium
+                             text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+              Mode
+            </label>
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value)}
-              className="w-full p-2 border rounded mb-2"
+              className="w-full p-3 border rounded-md mb-4
+                        bg-white dark:bg-[#49546F] 
+                        text-[#425278] dark:text-[#cbd6f0]
+                        border-[#425278]/30 dark:border-[#6b7aa8]/50
+                        focus:outline-none focus:ring-2 focus:ring-[#425278]/50 dark:focus:ring-[#6b7aa8]/50
+                        transition-colors duration-300"
             >
               <option value="single">Single Player</option>
               <option value="dual">Two Players</option>
             </select>
 
-            <label className="block mb-1 font-medium">Data source</label>
+            <label className="block mb-2 font-medium
+                             text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+              Data source
+            </label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setOnline(true)}
-                className={`px-3 py-1 rounded ${online ? "bg-green-600 text-white" : "bg-gray-100 dark:bg-gray-700"}`}
+                className={`flex-1 px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${
+                  online 
+                    ? "bg-[#425278] hover:bg-[#3a4770] text-white dark:bg-[#6b7aa8] dark:hover:bg-[#556294]" 
+                    : "bg-gray-200 hover:bg-gray-300 text-[#425278] dark:bg-[#49546F] dark:hover:bg-[#556294] dark:text-[#cbd6f0]"
+                }`}
               >
                 Online (API)
               </button>
               <button
                 type="button"
                 onClick={() => setOnline(false)}
-                className={`px-3 py-1 rounded ${!online ? "bg-green-600 text-white" : "bg-gray-100 dark:bg-gray-700"}`}
+                className={`flex-1 px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${
+                  !online 
+                    ? "bg-[#425278] hover:bg-[#3a4770] text-white dark:bg-[#6b7aa8] dark:hover:bg-[#556294]" 
+                    : "bg-gray-200 hover:bg-gray-300 text-[#425278] dark:bg-[#49546F] dark:hover:bg-[#556294] dark:text-[#cbd6f0]"
+                }`}
               >
                 Offline (Local)
               </button>
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block mb-1 font-medium">Player 1</label>
+          <div className="mb-6">
+            <label className="block mb-2 font-medium
+                             text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+              Player 1
+            </label>
             <input
               value={p1}
               onChange={(e) => setP1(e.target.value)}
               placeholder="Player 1 name"
-              className="w-full p-2 mb-2 border rounded dark:bg-gray-700"
+              className="w-full p-3 mb-4 border rounded-md
+                        bg-white dark:bg-[#49546F]
+                        text-[#425278] dark:text-[#cbd6f0]
+                        placeholder:text-[#425278]/50 dark:placeholder:text-[#cbd6f0]/50
+                        border-[#425278]/30 dark:border-[#6b7aa8]/50
+                        focus:outline-none focus:ring-2 focus:ring-[#425278]/50 dark:focus:ring-[#6b7aa8]/50
+                        transition-colors duration-300"
             />
 
             {mode === "dual" && (
               <>
-                <label className="block mb-1 font-medium">Player 2</label>
+                <label className="block mb-2 font-medium
+                                 text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+                  Player 2
+                </label>
                 <input
                   value={p2}
                   onChange={(e) => setP2(e.target.value)}
                   placeholder="Player 2 name"
-                  className="w-full p-2 border rounded dark:bg-gray-700"
+                  className="w-full p-3 border rounded-md
+                            bg-white dark:bg-[#49546F]
+                            text-[#425278] dark:text-[#cbd6f0]
+                            placeholder:text-[#425278]/50 dark:placeholder:text-[#cbd6f0]/50
+                            border-[#425278]/30 dark:border-[#6b7aa8]/50
+                            focus:outline-none focus:ring-2 focus:ring-[#425278]/50 dark:focus:ring-[#6b7aa8]/50
+                            transition-colors duration-300"
                 />
               </>
             )}
           </div>
 
-          <button onClick={start} className="w-full py-2 bg-green-600 text-white rounded">
+          <button 
+            onClick={start} 
+            className="w-full py-3 rounded-md shadow font-semibold
+                      bg-[#425278] hover:bg-[#3a4770] text-white
+                      dark:bg-[#6b7aa8] dark:hover:bg-[#556294]
+                      transition-colors duration-300
+                      cursor-pointer active:scale-[0.98]"
+          >
             Start Quiz
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

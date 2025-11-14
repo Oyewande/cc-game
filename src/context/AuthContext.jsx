@@ -14,6 +14,10 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsub = onAuthStateChanged(auth, (u) => { 
       setUser(u); 
       setLoading(false); 
@@ -21,9 +25,18 @@ export function AuthProvider({ children }) {
     return () => unsub();
   }, []);
 
-  const signup = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
-  const login = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
-  const logout = () => signOut(auth);
+  const signup = (email, pw) => {
+    if (!auth) throw new Error("Firebase not initialized");
+    return createUserWithEmailAndPassword(auth, email, pw);
+  };
+  const login = (email, pw) => {
+    if (!auth) throw new Error("Firebase not initialized");
+    return signInWithEmailAndPassword(auth, email, pw);
+  };
+  const logout = () => {
+    if (!auth) throw new Error("Firebase not initialized");
+    return signOut(auth);
+  };
 
   return (
     <AuthContext.Provider value={{ user, signup, login, logout }}>
