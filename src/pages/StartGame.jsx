@@ -68,24 +68,24 @@ export default function StartGame() {
               <button
                 type="button"
                 onClick={() => setOnline(true)}
-                className={`flex-1 px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${
+                className={`flex-1 px-4 py-2 rounded-md font-semibold transition-colors cursor-pointer duration-300 ${
                   online 
                     ? "bg-[#425278] hover:bg-[#3a4770] text-white dark:bg-[#6b7aa8] dark:hover:bg-[#556294]" 
                     : "bg-gray-200 hover:bg-gray-300 text-[#425278] dark:bg-[#49546F] dark:hover:bg-[#556294] dark:text-[#cbd6f0]"
                 }`}
               >
-                Online (API)
+                Online
               </button>
               <button
                 type="button"
                 onClick={() => setOnline(false)}
-                className={`flex-1 px-4 py-2 rounded-md font-semibold transition-colors duration-300 ${
+                className={`flex-1 px-4 py-2 rounded-md font-semibold transition-colors cursor-pointer duration-300 ${
                   !online 
                     ? "bg-[#425278] hover:bg-[#3a4770] text-white dark:bg-[#6b7aa8] dark:hover:bg-[#556294]" 
                     : "bg-gray-200 hover:bg-gray-300 text-[#425278] dark:bg-[#49546F] dark:hover:bg-[#556294] dark:text-[#cbd6f0]"
                 }`}
               >
-                Offline (Local)
+                Offline
               </button>
             </div>
           </div>

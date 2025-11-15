@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/UI/Navbar";
+import LeaderboardSidebar from "../components/Leaderboard/LeaderboardSidebar";
 
 function Home() {
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
   return (
     <div className="h-screen overflow-hidden flex flex-col relative
                     bg-[#e0e4f1] dark:bg-[#1f2a44] transition-colors duration-300">
@@ -15,7 +19,7 @@ function Home() {
 
         <p className="mb-4 md:mb-6 text-center max-w-xl text-sm md:text-base
                       text-[#2d3a5b] dark:text-[#cbd6f0] transition-colors duration-300">
-          Choose single or two-player mode and whether to play online (live API) or offline (local bundle).
+          Choose single or two-player mode.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-3 md:mb-4">
@@ -36,14 +40,20 @@ function Home() {
           </Link>
         </div>
 
-        <Link 
-          to="/results" 
-          className="text-xs md:text-sm underline
-                     text-[#425278] dark:text-[#aab6d6] transition-colors duration-300"
+        <button
+          onClick={() => setShowLeaderboard(true)}
+          className="px-6 md:px-8 py-2 md:py-3 rounded shadow font-semibold text-sm md:text-base
+                     bg-[#6b7aa8] hover:bg-[#556294] text-white
+                     dark:bg-[#425278] dark:hover:bg-[#3a4770]
+                     transition-colors duration-300"
         >
-          View Leaderboard / Results
-        </Link>
+          🏆 Leaderboard
+        </button>
       </div>
+
+      {showLeaderboard && (
+        <LeaderboardSidebar onClose={() => setShowLeaderboard(false)} />
+      )}
     </div>
   );
 }
