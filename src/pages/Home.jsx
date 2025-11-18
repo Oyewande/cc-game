@@ -45,7 +45,7 @@ function Home() {
           className="px-6 md:px-8 py-2 md:py-3 rounded shadow font-semibold text-sm md:text-base
                      bg-[#6b7aa8] hover:bg-[#556294] text-white
                      dark:bg-[#425278] dark:hover:bg-[#3a4770]
-                     transition-colors duration-300"
+                     transition-colors duration-300 cursor-pointer"
         >
           🏆 Leaderboard
         </button>
@@ -59,3 +59,5 @@ function Home() {
 }
 
 export default Home;
+
+

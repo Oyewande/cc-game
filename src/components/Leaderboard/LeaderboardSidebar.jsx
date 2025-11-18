@@ -14,14 +14,13 @@ export default function LeaderboardSidebar({ onClose }) {
         const snap = await getDocs(q);
         const games = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         
-        // Group by player and get highest score for each
         const playerScores = {};
         games.forEach(game => {
-          // Track player1's highest score
+
           if (!playerScores[game.player1] || playerScores[game.player1] < game.player1Score) {
             playerScores[game.player1] = game.player1Score;
           }
-          // Track player2's highest score (if not CPU)
+
           if (game.player2 && game.player2 !== "CPU") {
             if (!playerScores[game.player2] || playerScores[game.player2] < game.player2Score) {
               playerScores[game.player2] = game.player2Score;
@@ -29,7 +28,6 @@ export default function LeaderboardSidebar({ onClose }) {
           }
         });
         
-        // Convert to array and sort by score
         const sortedPlayers = Object.entries(playerScores)
           .map(([name, score]) => ({ name, score }))
           .sort((a, b) => b.score - a.score);
@@ -47,13 +45,11 @@ export default function LeaderboardSidebar({ onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex">
-      {/* Backdrop */}
       <div 
         className="flex-1 bg-black/50 animate-fadeIn"
         onClick={onClose}
       />
       
-      {/* Sidebar */}
       <div className="w-full max-w-md bg-white dark:bg-[#33405D] shadow-2xl overflow-y-auto
                       animate-slideInRight transition-colors duration-300">
         <div className="sticky top-0 bg-white dark:bg-[#33405D] border-b border-[#425278]/20 dark:border-[#6b7aa8]/30

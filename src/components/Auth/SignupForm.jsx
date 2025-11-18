@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth"
+import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth"
 import { auth, googleProvider } from "../../firebase/config"
 import EmailIcon from "@mui/icons-material/Email"
 import LockIcon from "@mui/icons-material/Lock"
@@ -11,7 +11,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility"
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 
 export default function SignupForm({ setUser }) {
-  const [name, setName] = useState("")
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -32,8 +32,16 @@ export default function SignupForm({ setUser }) {
     setLoading(true)
 
     try {
+      const trimmedUsername = username.trim()
+      if (!trimmedUsername) {
+        setError("Please choose a username")
+        setLoading(false)
+        return
+      }
+
       const result = await createUserWithEmailAndPassword(auth, email, password)
-      setUser(result.user)
+      await updateProfile(result.user, { displayName: trimmedUsername })
+      setUser({ ...result.user, displayName: trimmedUsername })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -47,7 +55,13 @@ export default function SignupForm({ setUser }) {
 
     try {
       const result = await signInWithPopup(auth, googleProvider)
-      setUser(result.user)
+      const firstName = (result.user.displayName || "").split(" ")[0] || ""
+      if (firstName) {
+        await updateProfile(result.user, { displayName: firstName })
+        setUser({ ...result.user, displayName: firstName })
+      } else {
+        setUser(result.user)
+      }
     } catch (err) {
       setError(err.message)
     } finally {
@@ -60,15 +74,15 @@ export default function SignupForm({ setUser }) {
       <div>
         <label className="block text-xs font-semibold mb-1
                          text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
-          Full Name
+          Username
         </label>
         <div className="relative">
           <PersonIcon className="absolute left-2 top-1.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your full name"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Choose a username"
             className="w-full pl-8 pr-3 py-1.5 rounded-md text-xs md:text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]

@@ -10,14 +10,15 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 export default function Game() {
   const loc = useLocation();
   const navigate = useNavigate();
-  const { mode = "single", online = true, player1 = "Player 1", player2 = "Player 2" } = loc.state || {};
+  const { mode = "single", online = true, player1 = "Player 1", player2 = "CPU" } = loc.state || {};
   const twoPlayer = mode === "dual";
+  const secondaryName = twoPlayer ? (player2 || "Player 2") : "CPU";
 
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const [players, setPlayers] = useState([
     { name: player1, score: 0, mistakes: 0 },
-    { name: player2, score: 0, mistakes: 0 },
+    { name: secondaryName, score: 0, mistakes: 0 },
   ]);
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [gameOver, setGameOver] = useState(false);
@@ -74,20 +75,26 @@ export default function Game() {
       p2s = players[1].score;
     if (db) {
       try {
-        await addDoc(collection(db, "leaderboard"), {
+        const payload = {
           player1: players[0].name,
-          player2: players[1].name,
           player1Score: p1s,
-          player2Score: p2s,
-          totalScore: p1s + p2s,
+          totalScore: twoPlayer ? p1s + p2s : p1s,
           timestamp: serverTimestamp(),
-        });
+        };
+        if (twoPlayer) {
+          payload.player2 = players[1].name;
+          payload.player2Score = p2s;
+        } else {
+          payload.player2 = null;
+          payload.player2Score = null;
+        }
+        await addDoc(collection(db, "leaderboard"), payload);
       } catch (err) {
         console.error("Save failed:", err);
       }
     }
     
-    navigate("/results", { state: { player1: players[0].name, player2: players[1].name, player1Score: p1s, player2Score: p2s } });
+    navigate("/results", { state: { player1: players[0].name, player2: twoPlayer ? players[1].name : "CPU", player1Score: p1s, player2Score: twoPlayer ? p2s : 0 } });
   };
 
   if (!questions.length) {
@@ -115,7 +122,9 @@ export default function Game() {
               Game Over
             </h2>
             <p className="mb-6 text-[#2d3a5b] dark:text-[#cbd6f0] transition-colors duration-300">
-              {players[0].name}: {players[0].score} — {players[1].name}: {players[1].score}
+              {twoPlayer
+                ? `${players[0].name}: ${players[0].score} — ${players[1].name}: ${players[1].score}`
+                : `${players[0].name}: ${players[0].score}`}
             </p>
             <div className="flex gap-3 justify-center">
               <button 

@@ -10,10 +10,10 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const preferredName = user?.displayName?.trim() || user?.email || "";
   
-  // Check if we're on an auth page
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/auth";
-
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+  
   const handleLogout = async () => {
     try {
       await logout();
@@ -22,6 +22,11 @@ export default function Navbar() {
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const handleLoginNavigate = () => {
+    navigate("/login");
+    setMenuOpen(false);
   };
 
   return (
@@ -36,10 +41,10 @@ export default function Navbar() {
         {/* Desktop Section */}
         <div className="hidden md:flex items-center gap-6">
           {!isAuthPage && (
-            <div className="text-sm">
+            <div className="text-sm flex items-center gap-2">
               {user ? (
                 <>
-                  <span className="mr-3">{user.email}</span>
+                  <span className="mr-1">{preferredName}</span>
                   <button
                     onClick={handleLogout}
                     className="px-3 py-1 rounded bg-white/20 hover:bg-white/30 transition"
@@ -48,7 +53,15 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                <span className="text-gray-200">Guest</span>
+                <>
+                  <span className="text-gray-200">Guest</span>
+                  <button
+                    onClick={handleLoginNavigate}
+                    className="px-3 py-1 rounded bg-white/10 hover:bg-white/30 transition cursor-pointer"
+                  >
+                    Login
+                  </button>
+                </>
               )}
             </div>
           )}
@@ -56,7 +69,6 @@ export default function Navbar() {
           <ThemeToggle />
         </div>
 
-        {/* Hamburger (mobile only) */}
         <button
           className="md:hidden text-white"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -68,12 +80,11 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden mt-4 bg-gray-600 dark:bg-[#2a3650] p-4 rounded-lg space-y-4 animate-slideDown">
-          {/* Auth - Only show if not on auth page */}
           {!isAuthPage && (
             <div>
               {user ? (
                 <>
-                  <div className="text-sm mb-2">{user.email}</div>
+                  <div className="text-sm mb-2">{preferredName}</div>
                   <button
                     onClick={handleLogout}
                     className="w-full px-4 py-2 rounded bg-white/20 hover:bg-white/30 transition text-left"
@@ -82,12 +93,19 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                <span className="text-gray-200">Guest</span>
+                <>
+                  <span className="text-gray-200 block mb-2">Guest</span>
+                  <button
+                    onClick={handleLoginNavigate}
+                    className="w-full px-4 py-2 rounded bg-white/20 hover:bg-white/30 transition text-left"
+                  >
+                    Login
+                  </button>
+                </>
               )}
             </div>
           )}
 
-          {/* Theme Toggle */}
           <div>
             <ThemeToggle />
           </div>

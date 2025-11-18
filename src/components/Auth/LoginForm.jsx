@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth"
+import { signInWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth"
 import { auth, googleProvider } from "../../firebase/config"
 import EmailIcon from "@mui/icons-material/Email"
 import LockIcon from "@mui/icons-material/Lock"
@@ -35,7 +35,13 @@ export default function LoginForm({ setUser }) {
 
     try {
       const result = await signInWithPopup(auth, googleProvider)
-      setUser(result.user)
+      const firstName = (result.user.displayName || "").split(" ")[0] || ""
+      if (firstName && result.user.displayName !== firstName) {
+        await updateProfile(result.user, { displayName: firstName })
+        setUser({ ...result.user, displayName: firstName })
+      } else {
+        setUser(result.user)
+      }
     } catch (err) {
       setError(err.message)
     } finally {

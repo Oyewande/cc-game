@@ -46,3 +46,60 @@ html, body {
 .animate-slideInRight {
   animation: slideInRight 0.3s ease-out;
 }
+
+@keyframes marqueeSway {
+  0% {
+    transform: translateX(-8%);
+    color: #425278;
+    text-shadow: none;
+  }
+  40% {
+    transform: translateX(6%);
+    color: #2b3a65;
+    text-shadow: none;
+  }
+  50% {
+    transform: translateX(8%);
+    color: #facc15;
+    text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+  }
+  60% {
+    transform: translateX(6%);
+    color: #2b3a65;
+    text-shadow: none;
+  }
+  100% {
+    transform: translateX(-8%);
+    color: #425278;
+    text-shadow: none;
+  }
+}
+
+.marquee-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(66, 82, 120, 0.3);
+  background: rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  animation: marqueeSway 5.5s ease-in-out infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.marquee-link::before,
+.marquee-link::after {
+  content: "★";
+  font-size: 0.85rem;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.marquee-link:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 30px rgba(66, 82, 120, 0.15);
+}
