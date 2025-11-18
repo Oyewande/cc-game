@@ -179,22 +179,24 @@ export default function Results(){
               Home
             </button>
           </div>
-          <div className="mt-6 flex flex-col items-center gap-3 w-full">
-            {redirecting && (
-              <div className="text-xs text-[#425278] dark:text-[#cbd6f0] animate-pulse">
-                Redirecting to login…
+          {!user && (
+            <div className="mt-6 flex flex-col items-center gap-3 w-full">
+              {redirecting && (
+                <div className="text-xs text-[#425278] dark:text-[#cbd6f0] animate-pulse">
+                  Redirecting to login…
+                </div>
+              )}
+              <div className="w-full flex justify-center overflow-hidden px-6">
+                <Link
+                  to="/login"
+                  onClick={handleDelayedLogin}
+                  className="marquee-link text-[#425278] dark:text-[#aab6d6] text-sm transition-colors duration-600"
+                >
+                  Want to join our leaderboard? Click here!
+                </Link>
               </div>
-            )}
-            <div className="w-full flex justify-center overflow-hidden px-6">
-              <Link
-                to="/login"
-                onClick={handleDelayedLogin}
-                className="marquee-link text-[#425278] dark:text-[#aab6d6] text-sm transition-colors duration-600"
-              >
-                Want to join our leaderboard? Click here!
-              </Link>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
