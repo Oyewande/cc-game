@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth"
 import { auth, googleProvider } from "../../firebase/config"
 import EmailIcon from "@mui/icons-material/Email"
@@ -19,6 +20,7 @@ export default function SignupForm({ setUser }) {
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const navigate = useNavigate()
 
   const handleEmailSignup = async (e) => {
     e.preventDefault()
@@ -42,6 +44,7 @@ export default function SignupForm({ setUser }) {
       const result = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(result.user, { displayName: trimmedUsername })
       setUser({ ...result.user, displayName: trimmedUsername })
+      navigate("/")
     } catch (err) {
       setError(err.message)
     } finally {
@@ -62,6 +65,7 @@ export default function SignupForm({ setUser }) {
       } else {
         setUser(result.user)
       }
+      navigate("/")
     } catch (err) {
       setError(err.message)
     } finally {

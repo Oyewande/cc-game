@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { signInWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth"
 import { auth, googleProvider } from "../../firebase/config"
 import EmailIcon from "@mui/icons-material/Email"
@@ -13,6 +14,7 @@ export default function LoginForm({ setUser }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const handleEmailLogin = async (e) => {
     e.preventDefault()
@@ -22,6 +24,7 @@ export default function LoginForm({ setUser }) {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password)
       setUser(result.user)
+      navigate("/")
     } catch (err) {
       setError(err.message)
     } finally {
@@ -42,6 +45,7 @@ export default function LoginForm({ setUser }) {
       } else {
         setUser(result.user)
       }
+      navigate("/")
     } catch (err) {
       setError(err.message)
     } finally {

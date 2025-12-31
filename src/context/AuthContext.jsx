@@ -18,20 +18,22 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
-    const unsub = onAuthStateChanged(auth, (u) => { 
-      setUser(u); 
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => { 
+      setUser(currentUser); 
       setLoading(false); 
     });
-    return () => unsub();
+    return () => unsubscribe();
   }, []);
 
-  const signup = (email, pw) => {
+  const signup = async (email, password) => {
     if (!auth) throw new Error("Firebase not initialized");
-    return createUserWithEmailAndPassword(auth, email, pw);
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    setUser(result.user); 
+    return result;
   };
-  const login = (email, pw) => {
+  const login = (email, password) => {
     if (!auth) throw new Error("Firebase not initialized");
-    return signInWithEmailAndPassword(auth, email, pw);
+    return signInWithEmailAndPassword(auth, email, password);
   };
   const logout = () => {
     if (!auth) throw new Error("Firebase not initialized");
@@ -39,7 +41,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, signup, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, signup, login, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

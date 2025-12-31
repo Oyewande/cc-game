@@ -2,9 +2,11 @@ import { useState } from "react"
 import Navbar from "../components/UI/Navbar"
 import LoginForm from "../components/Auth/LoginForm"
 import SignupForm from "../components/Auth/SignupForm"
+import { useAuth } from "../context/useAuth"
 
-export default function AuthPage({ setUser }) {
+export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(false)
+  const { setUser } = useAuth() || {}
 
   return (
     <div className="h-screen overflow-hidden flex flex-col relative

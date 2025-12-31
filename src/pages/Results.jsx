@@ -44,6 +44,9 @@ export default function Results(){
     setSaving(true);
     try {
       const payload = {
+        uid: user.uid,
+        userEmail: user.email || null,
+        userDisplayName: user.displayName || null,
         player1: safePlayer1,
         player1Score,
         totalScore: isTwoPlayerGame ? player1Score + player2Score : player1Score,
@@ -66,7 +69,15 @@ export default function Results(){
       setTimeout(() => setSaveStatus(null), 3000);
     } catch (err) {
       console.error("Save failed:", err);
-      setSaveStatus('error');
+
+      // Treat auth-related Firestore errors as "offline" so the UI
+      // clearly prompts the user to log in / re-authenticate
+      const code = err?.code || "";
+      if (code.includes("permission-denied") || code.includes("unauthenticated")) {
+        setSaveStatus('offline');
+      } else {
+        setSaveStatus('error');
+      }
       setTimeout(() => setSaveStatus(null), 3000);
     } finally {
       setSaving(false);
