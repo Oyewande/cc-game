@@ -11,9 +11,9 @@ export default function Navbar() {
   const location = useLocation();
   const { user, logout } = useAuth();
   const preferredName = user?.displayName?.trim() || user?.email || "";
-  
+
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
-  
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -30,47 +30,60 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full bg-[#495B85] dark:bg-[#33405D] text-white shadow-sm px-6 py-4">
-      <div className="flex items-center justify-between">
-        
+    <nav className="w-full bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-md
+                    border-b border-slate-200/60 dark:border-slate-700/60
+                    px-6 py-3 transition-colors duration-300 z-40">
+      <div className="flex items-center justify-between max-w-5xl mx-auto">
         {/* Logo */}
-        <div className="text-2xl md:text-3xl font-semibold">
+        <button
+          onClick={() => navigate("/")}
+          className="text-lg md:text-xl font-bold cursor-pointer
+                     text-slate-800 dark:text-white hover:opacity-80 transition-opacity"
+        >
           🌍 Capitals Quest
-        </div>
+        </button>
 
         {/* Desktop Section */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4">
           {!isAuthPage && (
-            <div className="text-sm flex items-center gap-2">
+            <div className="text-sm flex items-center gap-3">
               {user ? (
                 <>
-                  <span className="mr-1">{preferredName}</span>
+                  <span className="text-slate-600 dark:text-slate-300 font-medium">
+                    {preferredName}
+                  </span>
                   <button
                     onClick={handleLogout}
-                    className="px-3 py-1 rounded bg-white/20 hover:bg-white/30 transition"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold
+                              bg-slate-100 dark:bg-slate-800
+                              text-slate-600 dark:text-slate-300
+                              hover:bg-slate-200 dark:hover:bg-slate-700
+                              transition-all cursor-pointer"
                   >
                     Logout
                   </button>
                 </>
               ) : (
                 <>
-                  <span className="text-gray-200">Guest</span>
+                  <span className="text-slate-400 dark:text-slate-500 text-xs">Guest</span>
                   <button
                     onClick={handleLoginNavigate}
-                    className="px-3 py-1 rounded bg-white/10 hover:bg-white/30 transition cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold
+                              bg-emerald-600 hover:bg-emerald-700 text-white
+                              transition-all cursor-pointer"
                   >
-                    Login
+                    Sign In
                   </button>
                 </>
               )}
             </div>
           )}
-
           <ThemeToggle />
         </div>
 
+        {/* Mobile toggle */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-slate-600 dark:text-slate-300"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -79,33 +92,39 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden mt-4 bg-gray-600 dark:bg-[#2a3650] p-4 rounded-lg space-y-4 animate-slideDown">
+        <div className="md:hidden mt-3 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl space-y-3
+                        border border-slate-200/60 dark:border-slate-700/60 transition-colors duration-300">
           {!isAuthPage && (
             <div>
               {user ? (
                 <>
-                  <div className="text-sm mb-2">{preferredName}</div>
+                  <div className="text-sm mb-2 text-slate-700 dark:text-slate-200 font-medium">
+                    {preferredName}
+                  </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 rounded bg-white/20 hover:bg-white/30 transition text-left"
+                    className="w-full px-4 py-2 rounded-lg text-sm font-semibold text-left
+                              bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200
+                              hover:bg-slate-300 dark:hover:bg-slate-600 transition-all cursor-pointer"
                   >
                     Logout
                   </button>
                 </>
               ) : (
                 <>
-                  <span className="text-gray-200 block mb-2">Guest</span>
+                  <span className="text-slate-400 dark:text-slate-500 block mb-2 text-xs">Guest</span>
                   <button
                     onClick={handleLoginNavigate}
-                    className="w-full px-4 py-2 rounded bg-white/20 hover:bg-white/30 transition text-left"
+                    className="w-full px-4 py-2 rounded-lg text-sm font-semibold text-left
+                              bg-emerald-600 hover:bg-emerald-700 text-white
+                              transition-all cursor-pointer"
                   >
-                    Login
+                    Sign In
                   </button>
                 </>
               )}
             </div>
           )}
-
           <div>
             <ThemeToggle />
           </div>

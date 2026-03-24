@@ -1,151 +1,152 @@
-"use client"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { signInWithPopup, updateProfile } from "firebase/auth";
+import { auth, googleProvider } from "../../firebase/config";
+import { useAuth } from "../../context/useAuth";
+import { friendlyAuthError } from "../../context/AuthContext";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import PersonIcon from "@mui/icons-material/Person";
+import GoogleIcon from "@mui/icons-material/Google";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth"
-import { auth, googleProvider } from "../../firebase/config"
-import EmailIcon from "@mui/icons-material/Email"
-import LockIcon from "@mui/icons-material/Lock"
-import PersonIcon from "@mui/icons-material/Person"
-import GoogleIcon from "@mui/icons-material/Google"
-import VisibilityIcon from "@mui/icons-material/Visibility"
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
-
-export default function SignupForm({ setUser }) {
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const navigate = useNavigate()
+export default function SignupForm({ setIsLogin }) {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  const { signup } = useAuth();
 
   const handleEmailSignup = async (e) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      setError("Please choose a username.");
+      return;
+    }
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password should be at least 6 characters.");
+      return;
+    }
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Passwords do not match.");
+      return;
     }
 
-    setLoading(true)
-
+    setLoading(true);
     try {
-      const trimmedUsername = username.trim()
-      if (!trimmedUsername) {
-        setError("Please choose a username")
-        setLoading(false)
-        return
-      }
-
-      const result = await createUserWithEmailAndPassword(auth, email, password)
-      await updateProfile(result.user, { displayName: trimmedUsername })
-      setUser({ ...result.user, displayName: trimmedUsername })
-      navigate("/")
+      await signup(email, password, trimmedUsername);
+      navigate("/");
     } catch (err) {
-      setError(err.message)
+      setError(friendlyAuthError(err));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleSignup = async () => {
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
-      const result = await signInWithPopup(auth, googleProvider)
-      const firstName = (result.user.displayName || "").split(" ")[0] || ""
+      const result = await signInWithPopup(auth, googleProvider);
+      const firstName = (result.user.displayName || "").split(" ")[0] || "";
       if (firstName) {
-        await updateProfile(result.user, { displayName: firstName })
-        setUser({ ...result.user, displayName: firstName })
-      } else {
-        setUser(result.user)
+        await updateProfile(result.user, { displayName: firstName });
       }
-      navigate("/")
+      navigate("/");
     } catch (err) {
-      setError(err.message)
+      setError(friendlyAuthError(err));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-3">
       <div>
-        <label className="block text-xs font-semibold mb-1
-                         text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+        <label className="block text-xs font-semibold mb-1.5
+                         text-[#425278] dark:text-[#aab6d6]">
           Username
         </label>
         <div className="relative">
-          <PersonIcon className="absolute left-2 top-1.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
+          <PersonIcon className="absolute left-2.5 top-2.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Choose a username"
-            className="w-full pl-8 pr-3 py-1.5 rounded-md text-xs md:text-sm
+            className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
-                      placeholder:text-[#425278]/50 dark:placeholder:text-[#cbd6f0]/50
-                      border border-[#425278]/30 dark:border-[#6b7aa8]/50
-                      focus:outline-none focus:ring-2 focus:ring-[#425278]/50 dark:focus:ring-[#6b7aa8]/50
-                      transition-colors duration-300"
+                      placeholder:text-[#425278]/40 dark:placeholder:text-[#cbd6f0]/40
+                      border border-[#425278]/20 dark:border-[#6b7aa8]/30
+                      focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+                      transition-all duration-300"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-semibold mb-1
-                         text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+        <label className="block text-xs font-semibold mb-1.5
+                         text-[#425278] dark:text-[#aab6d6]">
           Email Address
         </label>
         <div className="relative">
-          <EmailIcon className="absolute left-2 top-1.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
+          <EmailIcon className="absolute left-2.5 top-2.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="w-full pl-8 pr-3 py-1.5 rounded-md text-xs md:text-sm
+            className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
-                      placeholder:text-[#425278]/50 dark:placeholder:text-[#cbd6f0]/50
-                      border border-[#425278]/30 dark:border-[#6b7aa8]/50
-                      focus:outline-none focus:ring-2 focus:ring-[#425278]/50 dark:focus:ring-[#6b7aa8]/50
-                      transition-colors duration-300"
+                      placeholder:text-[#425278]/40 dark:placeholder:text-[#cbd6f0]/40
+                      border border-[#425278]/20 dark:border-[#6b7aa8]/30
+                      focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+                      transition-all duration-300"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-semibold mb-1
-                         text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+        <label className="block text-xs font-semibold mb-1.5
+                         text-[#425278] dark:text-[#aab6d6]">
           Password
         </label>
         <div className="relative">
-          <LockIcon className="absolute left-2 top-1.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
+          <LockIcon className="absolute left-2.5 top-2.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
           <input
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Create a password"
-            className="w-full pl-8 pr-8 py-1.5 rounded-md text-xs md:text-sm
+            placeholder="Create a password (6+ characters)"
+            className="w-full pl-9 pr-9 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
-                      placeholder:text-[#425278]/50 dark:placeholder:text-[#cbd6f0]/50
-                      border border-[#425278]/30 dark:border-[#6b7aa8]/50
-                      focus:outline-none focus:ring-2 focus:ring-[#425278]/50 dark:focus:ring-[#6b7aa8]/50
-                      transition-colors duration-300"
+                      placeholder:text-[#425278]/40 dark:placeholder:text-[#cbd6f0]/40
+                      border border-[#425278]/20 dark:border-[#6b7aa8]/30
+                      focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+                      transition-all duration-300"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-1.5 text-[#425278]/50 dark:text-[#cbd6f0]/50
-                      hover:text-[#425278] dark:hover:text-[#aab6d6] transition-colors duration-300"
+            className="absolute right-2.5 top-2.5 text-[#425278]/50 dark:text-[#cbd6f0]/50
+                      hover:text-[#425278] dark:hover:text-[#aab6d6] transition-colors"
           >
             {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
           </button>
@@ -153,30 +154,30 @@ export default function SignupForm({ setUser }) {
       </div>
 
       <div>
-        <label className="block text-xs font-semibold mb-1
-                         text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
+        <label className="block text-xs font-semibold mb-1.5
+                         text-[#425278] dark:text-[#aab6d6]">
           Confirm Password
         </label>
         <div className="relative">
-          <LockIcon className="absolute left-2 top-1.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
+          <LockIcon className="absolute left-2.5 top-2.5 text-[#425278]/50 dark:text-[#cbd6f0]/50" fontSize="small" />
           <input
             type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm your password"
-            className="w-full pl-8 pr-8 py-1.5 rounded-md text-xs md:text-sm
+            className="w-full pl-9 pr-9 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
-                      placeholder:text-[#425278]/50 dark:placeholder:text-[#cbd6f0]/50
-                      border border-[#425278]/30 dark:border-[#6b7aa8]/50
-                      focus:outline-none focus:ring-2 focus:ring-[#425278]/50 dark:focus:ring-[#6b7aa8]/50
-                      transition-colors duration-300"
+                      placeholder:text-[#425278]/40 dark:placeholder:text-[#cbd6f0]/40
+                      border border-[#425278]/20 dark:border-[#6b7aa8]/30
+                      focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+                      transition-all duration-300"
           />
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-2 top-1.5 text-[#425278]/50 dark:text-[#cbd6f0]/50
-                      hover:text-[#425278] dark:hover:text-[#aab6d6] transition-colors duration-300"
+            className="absolute right-2.5 top-2.5 text-[#425278]/50 dark:text-[#cbd6f0]/50
+                      hover:text-[#425278] dark:hover:text-[#aab6d6] transition-colors"
           >
             {showConfirmPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
           </button>
@@ -184,8 +185,8 @@ export default function SignupForm({ setUser }) {
       </div>
 
       {error && (
-        <div className="p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 
-                       rounded-md text-red-600 dark:text-red-400 text-xs transition-colors duration-300">
+        <div className="p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800
+                       rounded-lg text-red-600 dark:text-red-400 text-xs">
           {error}
         </div>
       )}
@@ -193,35 +194,35 @@ export default function SignupForm({ setUser }) {
       <button
         onClick={handleEmailSignup}
         disabled={loading}
-        className="w-full py-2 rounded-md shadow font-semibold text-xs md:text-sm
-                  bg-[#425278] hover:bg-[#3a4770] text-white
-                  dark:bg-[#6b7aa8] dark:hover:bg-[#556294]
-                  transition-colors duration-300
+        className="w-full py-2.5 rounded-lg shadow font-semibold text-sm
+                  bg-[#0f172a] hover:bg-[#1e293b] text-white
+                  dark:bg-emerald-600 dark:hover:bg-emerald-700
+                  transition-all duration-300
                   cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? "Creating account..." : "Create Account"}
       </button>
 
-      <div className="flex items-center gap-2 py-0.5">
-        <div className="flex-1 h-px bg-[#425278]/20 dark:bg-[#6b7aa8]/30"></div>
-        <span className="text-[#425278]/60 dark:text-[#cbd6f0]/60 text-xs">Or continue with</span>
-        <div className="flex-1 h-px bg-[#425278]/20 dark:bg-[#6b7aa8]/30"></div>
+      <div className="flex items-center gap-3 py-1">
+        <div className="flex-1 h-px bg-[#425278]/15 dark:bg-[#6b7aa8]/20"></div>
+        <span className="text-[#425278]/50 dark:text-[#cbd6f0]/50 text-xs">or</span>
+        <div className="flex-1 h-px bg-[#425278]/15 dark:bg-[#6b7aa8]/20"></div>
       </div>
 
       <button
         onClick={handleGoogleSignup}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-2 rounded-md font-semibold text-xs md:text-sm
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm
                   bg-white dark:bg-[#49546F]
                   text-[#425278] dark:text-[#cbd6f0]
-                  border border-[#425278]/30 dark:border-[#6b7aa8]/50
+                  border border-[#425278]/20 dark:border-[#6b7aa8]/30
                   hover:bg-gray-50 dark:hover:bg-[#556294]
-                  transition-colors duration-300
+                  transition-all duration-300
                   cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <GoogleIcon fontSize="small" />
-        Sign up with Google
+        Continue with Google
       </button>
     </div>
-  )
+  );
 }

@@ -8,33 +8,38 @@ function Home() {
 
   return (
     <div className="h-screen overflow-hidden flex flex-col relative
-                    bg-[#e0e4f1] dark:bg-[#1f2a44] transition-colors duration-300">
+                    bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0f172a] dark:to-[#1e293b] transition-colors duration-300">
       <Navbar />
 
       <div className="flex-1 flex flex-col items-center justify-center p-6 overflow-y-auto">
-        <h1 className="text-4xl md:text-5xl font-bold mb-3 md:mb-4 text-center 
-                       text-[#425278] dark:text-[#aab6d6] transition-colors duration-300">
-          🌍 Country & Capitals Challenge
+        <div className="text-6xl md:text-7xl mb-4 animate-float">🌍</div>
+
+        <h1 className="text-3xl md:text-5xl font-bold mb-3 text-center
+                       text-slate-800 dark:text-white">
+          Capitals Quest
         </h1>
 
-        <p className="mb-4 md:mb-6 text-center max-w-xl text-sm md:text-base
-                      text-[#2d3a5b] dark:text-[#cbd6f0] transition-colors duration-300">
-          Choose single or two-player mode.
+        <p className="mb-8 text-center max-w-md text-sm md:text-base
+                      text-slate-500 dark:text-slate-400">
+          Test your geography knowledge. Choose single or two-player mode, pick a difficulty, and see where you rank.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-3 md:mb-4">
-          <Link 
-            to="/start?mode=single" 
-            className="px-6 md:px-8 py-2 md:py-3 rounded shadow font-semibold text-sm md:text-base
-                       bg-[#425278] hover:bg-[#3a4770] text-white transition-colors duration-300 dark:bg-[#6b7aa8] dark:hover:bg-[#556294]"
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <Link
+            to="/start?mode=single"
+            className="px-8 py-3 rounded-xl shadow-lg font-semibold text-sm
+                       bg-emerald-600 hover:bg-emerald-700 text-white
+                       transition-all duration-300 hover:shadow-emerald-500/25 hover:-translate-y-0.5"
           >
-            ▶ Single Player
+            🧑 Single Player
           </Link>
 
-          <Link 
-            to="/start?mode=dual" 
-            className="px-6 md:px-8 py-2 md:py-3 rounded shadow font-semibold text-sm md:text-base
-                       bg-[#425278] hover:bg-[#3a4770] text-white transition-colors duration-300 dark:bg-[#6b7aa8] dark:hover:bg-[#556294]"
+          <Link
+            to="/start?mode=dual"
+            className="px-8 py-3 rounded-xl shadow-lg font-semibold text-sm
+                       bg-slate-800 hover:bg-slate-900 text-white
+                       dark:bg-slate-700 dark:hover:bg-slate-600
+                       transition-all duration-300 hover:-translate-y-0.5"
           >
             👥 Two Players
           </Link>
@@ -42,10 +47,13 @@ function Home() {
 
         <button
           onClick={() => setShowLeaderboard(true)}
-          className="px-6 md:px-8 py-2 md:py-3 rounded shadow font-semibold text-sm md:text-base
-                     bg-[#6b7aa8] hover:bg-[#556294] text-white
-                     dark:bg-[#425278] dark:hover:bg-[#3a4770]
-                     transition-colors duration-300 cursor-pointer"
+          className="px-6 py-2.5 rounded-xl font-semibold text-sm
+                     bg-white dark:bg-[#1e293b]
+                     text-slate-700 dark:text-slate-200
+                     border border-slate-200 dark:border-slate-700
+                     hover:bg-slate-50 dark:hover:bg-slate-800
+                     shadow-sm hover:shadow-md
+                     transition-all duration-300 cursor-pointer"
         >
           🏆 Leaderboard
         </button>
@@ -59,5 +67,3 @@ function Home() {
 }
 
 export default Home;
-
-
