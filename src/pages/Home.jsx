@@ -21,7 +21,7 @@ function Home() {
 
         <p className="mb-8 text-center max-w-md text-sm md:text-base
                       text-slate-500 dark:text-slate-400">
-          Test your geography knowledge. Choose single or two-player mode, pick a difficulty, and see where you rank.
+          Test your geography knowledge. Pick a difficulty, compete on the leaderboard, and challenge players around the world.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -35,13 +35,13 @@ function Home() {
           </Link>
 
           <Link
-            to="/start?mode=dual"
+            to="/online"
             className="px-8 py-3 rounded-xl shadow-lg font-semibold text-sm
                        bg-slate-800 hover:bg-slate-900 text-white
                        dark:bg-slate-700 dark:hover:bg-slate-600
                        transition-all duration-300 hover:-translate-y-0.5"
           >
-            👥 Two Players
+            🌐 Multiplayer
           </Link>
         </div>
 

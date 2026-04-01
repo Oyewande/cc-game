@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const LABELS = ["A", "B", "C", "D"];
 const TIMER_SECONDS = 15;
@@ -8,6 +8,14 @@ function QuestionCard({ question, onAnswer, index, total, currentPlayer, players
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
 
+  // Keep a stable ref to onAnswer so timer effects never need it as a dependency.
+  // This prevents the cleanup from cancelling the setTimeout when handleAnswer
+  // gets a new reference (due to its own useCallback deps changing in Game.jsx).
+  const onAnswerRef = useRef(onAnswer);
+  useEffect(() => {
+    onAnswerRef.current = onAnswer;
+  }, [onAnswer]);
+
   // Reset state when question changes
   useEffect(() => {
     setSelected(null);
@@ -15,33 +23,39 @@ function QuestionCard({ question, onAnswer, index, total, currentPlayer, players
     setTimeLeft(TIMER_SECONDS);
   }, [index]);
 
-  // Timer countdown
+  // Effect A: countdown tick — only runs while time is actively counting down
   useEffect(() => {
-    if (showResult) return;
-    if (timeLeft <= 0) {
-      // Time's up — count as wrong
-      setSelected("__timeout__");
-      setShowResult(true);
-      const timer = setTimeout(() => {
-        onAnswer(null);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-    const interval = setInterval(() => {
-      setTimeLeft((t) => t - 1);
-    }, 1000);
+    if (showResult || timeLeft <= 0) return;
+    const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(interval);
-  }, [timeLeft, showResult, onAnswer]);
+  }, [showResult, timeLeft]);
+
+  // Effect B: timeout handler — fires when timeLeft hits 0.
+  // showResult is intentionally NOT in the dependency array.
+  // If it were, React would run the cleanup (clearTimeout) the moment
+  // setShowResult(true) triggers a re-render, killing the timer before it fires.
+  // With timeLeft as the only dep, cleanup only runs when the question changes
+  // (index reset → timeLeft resets to 15), by which time the timer has already fired.
+  useEffect(() => {
+    if (timeLeft > 0) return;
+    setSelected("__timeout__");
+    setShowResult(true);
+    const timer = setTimeout(() => {
+      onAnswerRef.current(null);
+    }, 1500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft]); // showResult intentionally omitted — see comment above
 
   const handleSelect = useCallback((opt) => {
     if (showResult) return;
     setSelected(opt);
     setShowResult(true);
     const timer = setTimeout(() => {
-      onAnswer(opt);
+      onAnswerRef.current(opt);
     }, 1200);
     return () => clearTimeout(timer);
-  }, [showResult, onAnswer]);
+  }, [showResult]); // onAnswer intentionally omitted — use ref instead
 
   if (!question) {
     return (

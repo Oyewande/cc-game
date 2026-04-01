@@ -32,9 +32,10 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-md
                     border-b border-slate-200/60 dark:border-slate-700/60
-                    px-6 py-3 transition-colors duration-300 z-40">
-      <div className="flex items-center justify-between max-w-5xl mx-auto">
-        {/* Logo */}
+                    transition-colors duration-300 z-40">
+      {/* Desktop & Mobile navbar bar */}
+      <div className="flex items-center justify-between px-6 py-3">
+        {/* Logo — always visible */}
         <button
           onClick={() => navigate("/")}
           className="text-lg md:text-xl font-bold cursor-pointer
@@ -43,8 +44,8 @@ export default function Navbar() {
           🌍 Capitals Quest
         </button>
 
-        {/* Desktop Section */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop Section — full spacing */}
+        <div className="hidden md:flex items-center gap-6">
           {!isAuthPage && (
             <div className="text-sm flex items-center gap-3">
               {user ? (
@@ -81,19 +82,22 @@ export default function Navbar() {
           <ThemeToggle />
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          className="md:hidden text-slate-600 dark:text-slate-300"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        {/* Mobile controls — dark mode toggle + menu icon */}
+        <div className="md:hidden flex items-center gap-3">
+          <ThemeToggle />
+          <button
+            className="text-slate-600 dark:text-slate-300 flex items-center justify-center"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <CloseIcon fontSize="small" /> : <MenuIcon fontSize="small" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden mt-3 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl space-y-3
-                        border border-slate-200/60 dark:border-slate-700/60 transition-colors duration-300">
+        <div className="md:hidden px-6 pb-4 bg-slate-50 dark:bg-slate-800 space-y-3
+                        border-t border-slate-200/60 dark:border-slate-700/60 transition-colors duration-300">
           {!isAuthPage && (
             <div>
               {user ? (
@@ -125,9 +129,6 @@ export default function Navbar() {
               )}
             </div>
           )}
-          <div>
-            <ThemeToggle />
-          </div>
         </div>
       )}
     </nav>

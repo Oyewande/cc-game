@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithPopup, updateProfile } from "firebase/auth";
-import { auth, googleProvider } from "../../firebase/config";
 import { useAuth } from "../../context/useAuth";
 import { friendlyAuthError } from "../../context/AuthContext";
 import EmailIcon from "@mui/icons-material/Email";
@@ -21,7 +19,7 @@ export default function SignupForm({ setIsLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const { signup, loginWithGoogle } = useAuth();
 
   const handleEmailSignup = async (e) => {
     e.preventDefault();
@@ -61,11 +59,7 @@ export default function SignupForm({ setIsLogin }) {
     setError("");
 
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const firstName = (result.user.displayName || "").split(" ")[0] || "";
-      if (firstName) {
-        await updateProfile(result.user, { displayName: firstName });
-      }
+      await loginWithGoogle();
       navigate("/");
     } catch (err) {
       setError(friendlyAuthError(err));
@@ -75,7 +69,7 @@ export default function SignupForm({ setIsLogin }) {
   };
 
   return (
-    <div className="space-y-3">
+    <form onSubmit={handleEmailSignup} noValidate className="space-y-3">
       <div>
         <label className="block text-xs font-semibold mb-1.5
                          text-[#425278] dark:text-[#aab6d6]">
@@ -88,6 +82,7 @@ export default function SignupForm({ setIsLogin }) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Choose a username"
+            autoComplete="username"
             className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
@@ -111,6 +106,7 @@ export default function SignupForm({ setIsLogin }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
+            autoComplete="email"
             className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
@@ -134,6 +130,7 @@ export default function SignupForm({ setIsLogin }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Create a password (6+ characters)"
+            autoComplete="new-password"
             className="w-full pl-9 pr-9 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
@@ -165,6 +162,7 @@ export default function SignupForm({ setIsLogin }) {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm your password"
+            autoComplete="new-password"
             className="w-full pl-9 pr-9 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
@@ -192,7 +190,7 @@ export default function SignupForm({ setIsLogin }) {
       )}
 
       <button
-        onClick={handleEmailSignup}
+        type="submit"
         disabled={loading}
         className="w-full py-2.5 rounded-lg shadow font-semibold text-sm
                   bg-[#0f172a] hover:bg-[#1e293b] text-white
@@ -210,6 +208,7 @@ export default function SignupForm({ setIsLogin }) {
       </div>
 
       <button
+        type="button"
         onClick={handleGoogleSignup}
         disabled={loading}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm
@@ -223,6 +222,6 @@ export default function SignupForm({ setIsLogin }) {
         <GoogleIcon fontSize="small" />
         Continue with Google
       </button>
-    </div>
+    </form>
   );
 }

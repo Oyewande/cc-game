@@ -5,27 +5,23 @@ import QuestionCard from "../components/Game/QuestionCard";
 import ScoreBoard from "../components/Game/Scoreboard";
 import { OFFLINE_COUNTRIES } from "../data/countriesOffline";
 
-// How many questions for offline mode
-const OFFLINE_QUESTION_COUNT = 20;
-
 export default function Game() {
   const loc = useLocation();
   const navigate = useNavigate();
   const {
     mode = "single",
-    online = true,
     player1 = "Player 1",
     player2 = "CPU",
     difficulty = "all",
     continent = "All",
+    anonymous = false,
   } = loc.state || {};
 
   const twoPlayer = mode === "dual";
   const secondaryName = twoPlayer ? (player2 || "Player 2") : "CPU";
 
-  // Online = unlimited questions (ends only on 3 mistakes)
-  // Offline = 20 questions (ends on 3 mistakes OR exhaustion)
-  const unlimited = online;
+  // Always unlimited — game ends only when a player hits 3 mistakes
+  const unlimited = true;
 
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
@@ -40,46 +36,49 @@ export default function Game() {
     async function load() {
       let pool = [];
 
-      if (online) {
-        try {
-          const res = await fetch("https://restcountries.com/v3.1/all?fields=name,capital,region");
-          const data = await res.json();
-          pool = data
-            .filter((c) => c.capital && c.capital.length > 0)
-            .map((c) => ({
+      try {
+        // Fetch population so we can assign difficulty tiers
+        const res = await fetch(
+          "https://restcountries.com/v3.1/all?fields=name,capital,region,population"
+        );
+        const data = await res.json();
+        pool = data
+          .filter((c) => c.capital && c.capital.length > 0)
+          .map((c) => {
+            const pop = c.population || 0;
+            return {
               country: c.name.common,
               capital: c.capital[0],
               continent: mapRegionToContinent(c.region),
-              difficulty: "medium",
-            }));
-        } catch (e) {
-          console.error("API fetch failed, switching to offline", e);
-          pool = [...OFFLINE_COUNTRIES];
-        }
-      } else {
+              // Difficulty based on how well-known a country is (population as proxy)
+              difficulty: pop > 50_000_000 ? "easy" : pop > 5_000_000 ? "medium" : "hard",
+            };
+          })
+          // Drop countries whose region didn't map to a known continent
+          .filter((c) => c.continent !== null);
+      } catch (e) {
+        console.error("API fetch failed, falling back to built-in data", e);
         pool = [...OFFLINE_COUNTRIES];
       }
 
-      // Filter by continent
+      // --- Filter by continent ---
       if (continent !== "All") {
         const filtered = pool.filter((c) => c.continent === continent);
+        // Only apply the filter if there are enough questions; otherwise play globally
         if (filtered.length >= 8) pool = filtered;
       }
 
-      // Filter by difficulty (offline only — online data has no tags)
-      if (difficulty !== "all" && !online) {
+      // --- Filter by difficulty ---
+      // Now works for both online and offline because online data has population-derived tags
+      if (difficulty !== "all") {
         const filtered = pool.filter((c) => c.difficulty === difficulty);
         if (filtered.length >= 8) pool = filtered;
       }
 
-      // Shuffle the pool
+      // Shuffle
       const shuffled = pool.sort(() => Math.random() - 0.5);
 
-      // Online: use the entire shuffled pool (unlimited until 3 mistakes)
-      // Offline: slice to 20 questions
-      const questionPool = unlimited ? shuffled : shuffled.slice(0, OFFLINE_QUESTION_COUNT);
-
-      const prepared = questionPool.map((q) => {
+      const prepared = shuffled.map((q) => {
         const wrong = [];
         let attempts = 0;
         while (wrong.length < 3 && attempts < 100) {
@@ -97,9 +96,9 @@ export default function Game() {
       setQuestions(prepared);
     }
     load();
-  }, [online, difficulty, continent, unlimited]);
+  }, [difficulty, continent]);
 
-  // Game-over conditions in a dedicated effect (handles 3-mistake knockouts)
+  // Game-over: triggered when any player reaches 3 mistakes
   useEffect(() => {
     if (questions.length === 0) return;
     for (const p of players) {
@@ -108,20 +107,15 @@ export default function Game() {
         return;
       }
     }
-
-    if (!unlimited && index >= questions.length) {
-      setGameOver(true);
-    }
-  }, [index, players, questions.length, unlimited]);
+  }, [players, questions.length]);
 
   const handleAnswer = useCallback((opt) => {
     if (gameOver) return;
     const q = questions[index];
     if (!q) return;
 
-    const isCorrect = opt === q.correct;
-
-    let nextGameOver = false;
+    // opt === null means the timer ran out — treat as wrong answer
+    const isCorrect = opt !== null && opt === q.correct;
 
     setPlayers((prev) => {
       const copy = prev.map((p) => ({ ...p }));
@@ -129,35 +123,25 @@ export default function Game() {
         copy[currentPlayer].score += 1;
       } else {
         copy[currentPlayer].mistakes += 1;
-        if (copy[currentPlayer].mistakes >= 3) nextGameOver = true;
       }
       return copy;
     });
 
-    const nextIndex = index + 1;
-
-    // Offline: end at question limit
-    if (!unlimited && nextIndex >= questions.length) nextGameOver = true;
-
-    if (nextGameOver) {
-      setGameOver(true);
-    }
-
-    setIndex(nextIndex);
+    setIndex((i) => i + 1);
     if (twoPlayer) setCurrentPlayer((p) => (p === 0 ? 1 : 0));
-  }, [gameOver, questions, index, currentPlayer, twoPlayer, unlimited]);
+  }, [gameOver, questions, index, currentPlayer, twoPlayer]);
 
   const goToResults = () => {
     navigate("/results", {
       state: {
         mode,
+        anonymous,
         player1: players[0].name,
         player2: twoPlayer ? players[1].name : "CPU",
         player1Score: players[0].score,
         player2Score: twoPlayer ? players[1].score : 0,
         difficulty,
         continent,
-        online,
       },
     });
   };
@@ -256,7 +240,7 @@ export default function Game() {
           question={{ country: q.country, options: q.options, correct: q.correct }}
           onAnswer={handleAnswer}
           index={index + 1}
-          total={unlimited ? null : questions.length}
+          total={null}
           currentPlayer={currentPlayer}
           players={players}
         />
@@ -272,7 +256,8 @@ function mapRegionToContinent(region) {
     Asia: "Asia",
     Americas: "Americas",
     Oceania: "Oceania",
-    Antarctic: "Oceania",
+    // Antarctic and any unknown regions return null so they get filtered out
+    // and never appear in the question pool
   };
-  return map[region] || "All";
+  return map[region] ?? null;
 }

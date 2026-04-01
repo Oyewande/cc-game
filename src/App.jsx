@@ -4,6 +4,7 @@ import StartGame from "./pages/StartGame";
 import Game from "./pages/Game";
 import Results from "./pages/Results";
 import AuthPage from "./pages/AuthPage";
+import OnlineMultiplayer from "./pages/OnlineMultiplayer";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 
 function App() {
@@ -13,6 +14,15 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/start" element={<StartGame />} />
+        {/* /online requires a real account — no guestAllowed */}
+        <Route
+          path="/online"
+          element={
+            <ProtectedRoute>
+              <OnlineMultiplayer />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/game"
           element={

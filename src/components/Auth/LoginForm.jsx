@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithPopup, updateProfile } from "firebase/auth";
-import { auth, googleProvider } from "../../firebase/config";
 import { useAuth } from "../../context/useAuth";
 import { friendlyAuthError } from "../../context/AuthContext";
 import EmailIcon from "@mui/icons-material/Email";
@@ -20,7 +18,7 @@ export default function LoginForm() {
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const navigate = useNavigate();
-  const { login, resetPassword } = useAuth();
+  const { login, loginWithGoogle, resetPassword } = useAuth();
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
@@ -32,7 +30,7 @@ export default function LoginForm() {
     setError("");
 
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       navigate("/");
     } catch (err) {
       setError(friendlyAuthError(err));
@@ -46,11 +44,7 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const firstName = (result.user.displayName || "").split(" ")[0] || "";
-      if (firstName && result.user.displayName !== firstName) {
-        await updateProfile(result.user, { displayName: firstName });
-      }
+      await loginWithGoogle();
       navigate("/");
     } catch (err) {
       setError(friendlyAuthError(err));
@@ -135,7 +129,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="space-y-3">
+    <form onSubmit={handleEmailLogin} noValidate className="space-y-3">
       <div>
         <label className="block text-xs font-semibold mb-1.5
                          text-[#425278] dark:text-[#aab6d6]">
@@ -148,6 +142,7 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
+            autoComplete="email"
             className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
@@ -171,6 +166,7 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
+            autoComplete="current-password"
             className="w-full pl-9 pr-9 py-2.5 rounded-lg text-sm
                       bg-white dark:bg-[#49546F]
                       text-[#425278] dark:text-[#cbd6f0]
@@ -192,6 +188,7 @@ export default function LoginForm() {
 
       <div className="text-right">
         <button
+          type="button"
           onClick={() => setShowForgot(true)}
           className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
         >
@@ -207,7 +204,7 @@ export default function LoginForm() {
       )}
 
       <button
-        onClick={handleEmailLogin}
+        type="submit"
         disabled={loading}
         className="w-full py-2.5 rounded-lg shadow font-semibold text-sm
                   bg-[#0f172a] hover:bg-[#1e293b] text-white
@@ -225,6 +222,7 @@ export default function LoginForm() {
       </div>
 
       <button
+        type="button"
         onClick={handleGoogleLogin}
         disabled={loading}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm
@@ -238,6 +236,6 @@ export default function LoginForm() {
         <GoogleIcon fontSize="small" />
         Continue with Google
       </button>
-    </div>
+    </form>
   );
 }

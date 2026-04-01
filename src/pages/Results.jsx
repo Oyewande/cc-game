@@ -18,9 +18,9 @@ export default function Results() {
     player1Score = 0,
     player2Score = 0,
     mode,
+    anonymous = false,
     difficulty,
     continent,
-    online,
   } = loc.state || {};
 
   const [leaderboard, setLeaderboard] = useState([]);
@@ -38,12 +38,20 @@ export default function Results() {
   const medals = ["🥇", "🥈", "🥉"];
 
   useEffect(() => {
+    // Never save for dual-player (pass-and-play) games or anonymous sessions
+    if (mode === "dual") {
+      setSaveStatus("dual-player");
+      return;
+    }
+    if (anonymous) {
+      setSaveStatus("anonymous");
+      return;
+    }
     if (!user) {
       setSaveStatus("not-authenticated");
       return;
     }
     if (needsDisplayName) {
-
       return;
     }
     async function autoSave() {
@@ -55,7 +63,7 @@ export default function Results() {
       }
     }
     autoSave();
-  }, [user, player1Score, needsDisplayName]);
+  }, [user, player1Score, needsDisplayName, mode, anonymous]);
 
 
   useEffect(() => {
@@ -108,7 +116,7 @@ export default function Results() {
     navigate("/game", {
       state: {
         mode: mode || "single",
-        online: online ?? true,
+        anonymous: anonymous || false,
         difficulty: difficulty || "all",
         continent: continent || "All",
         player1: safePlayer1,
@@ -186,10 +194,14 @@ export default function Results() {
                   ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
                   : saveStatus === "not-authenticated"
                   ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
+                  : saveStatus === "dual-player" || saveStatus === "anonymous"
+                  ? "bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                   : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800"
               }`}>
                 {saveStatus === "new-high" && "🎉 New high score saved!"}
                 {saveStatus === "saved" && "Score saved to leaderboard."}
+                {saveStatus === "dual-player" && "Pass & Play scores aren't tracked on the leaderboard."}
+                {saveStatus === "anonymous" && "Playing as Anonymous — scores aren't tracked."}
                 {saveStatus === "not-authenticated" && (
                   <>
                     Log in to join the leaderboard.{" "}

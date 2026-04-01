@@ -1,11 +1,12 @@
 import { createContext, useEffect, useState } from "react";
-import { auth } from "../firebase/config";
+import { auth, googleProvider } from "../firebase/config";
 import {
   onAuthStateChanged,
   signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  signInWithPopup,
   updateProfile,
 } from "firebase/auth";
 
@@ -52,14 +53,30 @@ export function AuthProvider({ children }) {
     if (displayName) {
       await updateProfile(result.user, { displayName });
     }
-    // Force refresh user object so displayName is available immediately
-    setUser({ ...result.user, displayName: displayName || result.user.displayName });
+    // Use auth.currentUser (the live Firebase User object) — never spread it.
+    // Spreading destroys prototype methods (getIdToken, reload, etc.).
+    // onAuthStateChanged fires on account creation but before updateProfile
+    // completes, so we manually sync here to get the displayName immediately.
+    setUser(auth.currentUser);
     return result;
   };
 
   const login = (email, password) => {
     if (!auth) throw new Error("Firebase not initialized");
     return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  // Centralised Google sign-in used by both LoginForm and SignupForm.
+  // Trims the display name to first name only for a cleaner leaderboard.
+  const loginWithGoogle = async () => {
+    if (!auth) throw new Error("Firebase not initialized");
+    const result = await signInWithPopup(auth, googleProvider);
+    const firstName = (result.user.displayName || "").split(" ")[0].trim();
+    if (firstName && result.user.displayName !== firstName) {
+      await updateProfile(result.user, { displayName: firstName });
+      setUser(auth.currentUser);
+    }
+    return result;
   };
 
   const logout = () => {
@@ -73,7 +90,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signup, login, logout, resetPassword }}>
+    <AuthContext.Provider value={{ user, loading, signup, login, loginWithGoogle, logout, resetPassword }}>
       {!loading && children}
     </AuthContext.Provider>
   );
